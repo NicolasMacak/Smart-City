@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey.Utils;
 
-public class GridStructure
+public class GridStructure<TGridObject>
 {
     private int widthX;
     private int heightZ;
     private float cellSize;
-    private int[,] gridArray;
+    private TGridObject[,] gridArray;
     // Keby bolo treba, da sa dat aj originPosition Vector3
     // https://www.youtube.com/watch?v=waEsGu--9P8&list=PLzDRvYVwl53uhO8yhqxcyjDImRjO9W722
     // 19:30
@@ -21,7 +21,7 @@ public class GridStructure
         this.heightZ = height;
         this.cellSize = cellSize;
 
-        gridArray = new int[width, height];
+        gridArray = new TGridObject[width, height];
         debugTextArray = new TextMesh[width, height];
 
         for (int x = 0; x < gridArray.GetLength(0); x++)
@@ -29,7 +29,7 @@ public class GridStructure
             for(int z = 0; z < gridArray.GetLength(1); z++)
             {
                debugTextArray[x, z] = UtilsClass.CreateWorldText(
-                    gridArray[x, z].ToString(), 
+                    x+","+z, 
                     null, 
                     GetWorldPosition(x, z) + new Vector3(cellSize, 0, cellSize) * 0.5f,
                     20,
@@ -44,10 +44,10 @@ public class GridStructure
         Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.red, 100f);
         Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.red, 100f);
 
-        SetValue(2, 1, 56);
+        //SetValue(2, 1, 56);
     }
 
-    private Vector3 GetWorldPosition(int x, int z)
+    public Vector3 GetWorldPosition(int x, int z)
     {
         return new Vector3(x, 0, z) * cellSize;
     }
@@ -58,7 +58,7 @@ public class GridStructure
         z = Mathf.FloorToInt(worldPosition.z / cellSize);
     }
 
-    public void SetValue(int x, int z, int value)
+    public void SetValue(int x, int z, TGridObject value)
     {
         if (x >= 0 && z >= 0 && x < widthX && z < heightZ)
         {
@@ -67,7 +67,7 @@ public class GridStructure
         }
     }
 
-    public void SetValue(Vector3 worldPosition, int value)
+    public void SetValue(Vector3 worldPosition, TGridObject value)
     {
         Debug.Log(worldPosition);
         int x, z;
@@ -75,18 +75,18 @@ public class GridStructure
         SetValue(x, z, value);
     }
 
-    public int GetValue(int x, int z)
+    public TGridObject GetValue(int x, int z)
     {
         if(x >= 0 && z >= 0 && x < widthX && z < heightZ)
         {
             return gridArray[x, z];
         } else
         {
-            return 0;
+            return default(TGridObject);
         }
     }
 
-    public int GetValue(Vector3 worldPosition)
+    public TGridObject GetValue(Vector3 worldPosition)
     {
         int x, z;
         GetXZ(worldPosition, out x, out z);
