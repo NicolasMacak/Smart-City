@@ -1,122 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Simulation>
-    <environmentStuctures>
-        <consumerStructures>
-            <consumerStructure>
-                <id>1</id>
-                <position>
-                    <x>1</x>
-                    <z>1</z>
-                </position>
-                <length>4</length>
-                <width>5</width>
-                <category>House</category>
-                <!-- <size>Small</size>
-                <cars>SmallCar</cars>
-                <additions>SolarPanels</additions>
-                <levels>
-                    <id>1</id>
-                    <samplingPoints>
-                        <id>1</id>
-                    </samplingPoints>
-                </levels>
-                <samplingPoint>
-                    <id>1</id>
-                </samplingPoint> -->
-            </consumerStructure>
-            <consumerStructure>
-                <id>1</id>
-                <position>
-                    <x>4</x>
-                    <z>0</z>
-                </position>
-                <length>4</length>
-                <width>5</width>
-                <category>House</category>
-                <!-- <size>Small</size>
-                <cars>SmallCar</cars>
-                <additions>SolarPanels</additions>
-                <levels>
-                    <id>1</id>
-                    <samplingPoints>
-                        <id>1</id>
-                    </samplingPoints>
-                </levels>
-                <samplingPoint>
-                    <id>1</id>
-                </samplingPoint> -->
-            </consumerStructure>
-            <consumerStructure>
-                <id>1</id>
-                <position>
-                    <x>4</x>
-                    <z>2</z>
-                </position>
-                <length>4</length>
-                <width>5</width>
-                <category>House</category>
-                <!-- <size>Small</size>
-                <cars>SmallCar</cars>
-                <additions>SolarPanels</additions>
-                <levels>
-                    <id>1</id>
-                    <samplingPoints>
-                        <id>1</id>
-                    </samplingPoints>
-                </levels>
-                <samplingPoint>
-                    <id>1</id>
-                </samplingPoint> -->
-            </consumerStructure>
-        </consumerStructures>
-        <!-- <electricNetworkStructures>
-			<electricNetworkStructure>
-				<id>1</id>
-				<position>
-					<x>250</x>
-					<z>320</z>
-				</position>
-				<length>4</length>
-				<width>5</width>
-				<category>TraffoStation</category>
-				<size>Small</size>
-			</electricNetworkStructure>
-		</electricNetworkStructures>
-		<trafficStructures>
-			<roads>
-				<road>
-					<id>1</id>
-					<additions>Trees</additions>
-					<bidirectional>true</bidirectional>
-					<laneCount>2</laneCount>
-				</road>
-			</roads>
-			<intersections>
-				<intersection>
-					<id>1</id>
-					<position>
-						<x>250</x>
-						<z>320</z>
-					</position>
-					<length>4</length>
-					<width>5</width>
-					<type>Crossroad</type>
-				</intersection>
-			</intersections>
-		</trafficStructures>
-		<genericStructures>
-			<genericStructure>
-				<id>1</id>
-				<position>
-					<x>250</x>
-					<z>320</z>
-				</position>
-				<length>4</length>
-				<width>5</width>
-				<category>Tree</category>
-			</genericStructure>
-		</genericStructures> -->
-    </environmentStuctures>
+    <!-- <environmentStuctures> -->
+    <id>5</id>
+    <consumerStructures>
+        <consumerStructure>
+            <id>8</id>
+            <position>
+                <x>1</x>
+                <z>1</z>
+            </position>
+            <length>4</length>
+            <width>5</width>
+            <category>House</category>
+        </consumerStructure>
+        <consumerStructure>
+            <id>6</id>
+            <position>
+                <x>4</x>
+                <z>0</z>
+            </position>
+            <length>4</length>
+            <width>5</width>
+            <category>House</category>
+        </consumerStructure>
+        <consumerStructure>
+            <id>9</id>
+            <position>
+                <x>4</x>
+                <z>2</z>
+            </position>
+            <length>4</length>
+            <width>5</width>
+            <category>House</category>
+        </consumerStructure>
+    </consumerStructures>
     <environmentParameters>
         <weather>
             <wind>15</wind>
