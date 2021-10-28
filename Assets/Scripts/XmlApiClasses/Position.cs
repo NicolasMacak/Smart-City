@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml.Serialization;
 
-public class Position
+public class Positionsss
 {
     [XmlElement("x")]
     public int x { get; set; }

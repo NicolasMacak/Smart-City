@@ -150,6 +150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69dc0a7b2cebfff4e9914df3d0982261, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  consumerBuilding: {fileID: 3601919754531196679, guid: fdd1971e735a46e4c8965d8d498f6cbb,
+    type: 3}
+  road: {fileID: 3601919754531196679, guid: 8fbf67ebd9adf1c4eb9aeead481dfd49, type: 3}
 --- !u!4 &640563272
 Transform:
   m_ObjectHideFlags: 0

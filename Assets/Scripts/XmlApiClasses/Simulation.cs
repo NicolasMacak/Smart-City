@@ -26,12 +26,28 @@ public class ConsumerStructure
     [XmlElement("id")]
     public int id { get; set; }
 
-    [XmlElement("position")]
-    public int position { get; set; }
-
     [XmlElement("category")]
     public string category { get; set; }
+
+    [XmlElement("position")]
+    public Position position { get; set; }
+
+    override
+    public string ToString()
+    {
+        return "id: " + id+ " category: " + category + " x: " + position.x + " z: " + position.z;
+    }
 }
+
+public class Position
+{
+    [XmlElement("x")]
+    public int x { get; set; }
+
+    [XmlElement("z")]
+    public int z { get; set; }
+}
+
 
 //[XmlRoot("consumerStructures")]
 //public class ConsumerStructureso
