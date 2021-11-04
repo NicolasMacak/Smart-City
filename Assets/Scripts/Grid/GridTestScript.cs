@@ -11,7 +11,7 @@ public class GridTestScript : MonoBehaviour
     public Transform consumerBuilding;
 
     [SerializeField]
-    public Transform road;
+    public Transform roadPrefab;
 
     private GridStructure<int> grid;
     // Start is called before the first frame update
@@ -21,20 +21,25 @@ public class GridTestScript : MonoBehaviour
         XmlSerializer serializer = new XmlSerializer(typeof(Simulation));
         var simulation = (Simulation)serializer.Deserialize(fileStream);
 
-        grid = new GridStructure<int>(5, 5, 10f);
+        grid = new GridStructure<int>(40, 40, 10f);
 
-        Debug.Log(simulation.id);
-        Debug.Log("fcking Velkost "+simulation.consumerStructures.Count);
+        //Debug.Log("Velkost "+simulation.consumerStructures.Count);
         foreach (var consumerStructure in simulation.consumerStructures)
         {
             int x = consumerStructure.position.x;
             int z = consumerStructure.position.z;
-            Debug.Log(consumerStructure.ToString());
+            //Debug.Log(consumerStructure.ToString());
 
-            Instantiate(consumerBuilding, grid.GetWorldPosition(x, z), Quaternion.identity);
+            placeBulding(x, z);// Instantiate(consumerBuilding, grid.GetWorldPosition(x, z), Quaternion.identity);
         }
 
-
+        //Debug.Log("Velkost " + simulation.roads.Count);
+        //foreach (var road in simulation.roads)
+        //{
+        //    Debug.Log(road.ToString());
+        //    constructRoad(road);
+        //}
+        
         
         //grid.SetValue(new Vector3(12f, 0, 5f), 40);
         //Debug.Log(grid.GetValue(new Vector3(12f, 0, 5f)));
@@ -50,6 +55,37 @@ public class GridTestScript : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             grid.SetValue(UtilsClass.GetMouseWorldPosition(), 40);
+        }
+    }
+
+    // builder section
+
+    public void placeBulding(int x, int z)
+    {
+        Instantiate(consumerBuilding, grid.GetWorldPosition(x, z), Quaternion.identity);
+    }
+
+    public void constructRoad(Road road)
+    {
+        int startX = road.startPoint.x;
+        int startZ = road.startPoint.z;
+
+        int endX = road.endPoint.x;
+        int endZ = road.endPoint.z;
+
+        if (endX - startX == 0) // road is horizontal along X
+        {
+            for (int z = startZ; z <= endZ; z++)
+            {
+                Instantiate(roadPrefab, grid.GetWorldPosition(startX, z), Quaternion.identity);
+            }
+        }
+        else
+        {
+            for (int x = startX; x >= endX; x--)
+            {
+                Instantiate(roadPrefab, grid.GetWorldPosition(x, startZ), Quaternion.identity);
+            }
         }
     }
 }

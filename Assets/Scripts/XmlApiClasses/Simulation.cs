@@ -7,9 +7,12 @@ using UnityEngine;
 public class Simulation
 {
     [XmlArray("consumerStructures")]
-    //[XmlElement("consumerStructures")]
     [XmlArrayItem(ElementName = "consumerStructure")]
     public List<ConsumerStructure> consumerStructures { get; set; }
+
+    [XmlArray("roads")]
+    [XmlArrayItem(ElementName = "road")]
+    public List<Road> roads { get; set; }
 
     [XmlElement("id")]
     public int id { get; set; }
@@ -36,6 +39,21 @@ public class ConsumerStructure
     public string ToString()
     {
         return "id: " + id+ " category: " + category + " x: " + position.x + " z: " + position.z;
+    }
+}
+
+public class Road
+{
+    [XmlElement("startPoint")]
+    public Position startPoint { get; set; }
+
+    [XmlElement("endPoint")]
+    public Position endPoint { get; set; }
+
+    override
+    public string ToString()
+    {
+        return "start: " + startPoint.x + " "+ startPoint.z + " end: " + endPoint.x + " " + endPoint.z;
     }
 }
 
