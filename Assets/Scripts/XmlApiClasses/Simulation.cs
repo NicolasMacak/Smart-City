@@ -10,22 +10,34 @@ public class Simulation
     [XmlArrayItem(ElementName = "consumerStructure")]
     public List<ConsumerStructure> consumerStructures { get; set; }
 
-    [XmlArray("roads")]
-    [XmlArrayItem(ElementName = "road")]
-    public List<Road> roads { get; set; }
+    //[XmlArray("roads")]
+    //[XmlArrayItem(ElementName = "road")]
+    //public List<Road> roads { get; set; }
+
+    
 
     [XmlElement("id")]
     public int id { get; set; }
 }
 
-public class ConsumerStructures
-{
-    [XmlArrayItem("consumerStructure")]
-    public ConsumerStructure[] consumerStructures { get; set; }
-}
+//public class ConsumerStructures
+//{
+//    [XmlArrayItem("consumerStructure")]
+//    public ConsumerStructure[] consumerStructures { get; set; }
+//}
 
 public class ConsumerStructure
+
 {
+    public ConsumerStructure() { }
+
+    public ConsumerStructure(Transform consumerStructure)
+    {
+        this.id = 1;
+        this.category = "House";
+        this.position = GameObjectUtilities.GetPosition(consumerStructure.transform.position, 10f);
+    }
+
     [XmlElement("id")]
     public int id { get; set; }
 
@@ -42,29 +54,23 @@ public class ConsumerStructure
     }
 }
 
-public class Road
-{
-    [XmlElement("startPoint")]
-    public Position startPoint { get; set; }
-
-    [XmlElement("endPoint")]
-    public Position endPoint { get; set; }
-
-    override
-    public string ToString()
-    {
-        return "start: " + startPoint.x + " "+ startPoint.z + " end: " + endPoint.x + " " + endPoint.z;
-    }
-}
-
 public class Position
 {
+    public Position() { }
+    public Position(int x, int z)
+    {
+        this.x = x;
+        this.z = z;
+    }
+
     [XmlElement("x")]
     public int x { get; set; }
 
     [XmlElement("z")]
     public int z { get; set; }
 }
+
+
 
 
 //[XmlRoot("consumerStructures")]

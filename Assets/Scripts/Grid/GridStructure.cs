@@ -52,12 +52,6 @@ public class GridStructure<TGridObject>
         return new Vector3(x, 0, z) * cellSize;
     }
 
-    private void GetXZ(Vector3 worldPosition, out int x, out int z) // refactor na normalny datovy typ
-    {
-        x = Mathf.FloorToInt(worldPosition.x / cellSize);
-        z = Mathf.FloorToInt(worldPosition.z / cellSize);
-    }
-
     public void SetValue(int x, int z, TGridObject value)
     {
         if (x >= 0 && z >= 0 && x < widthX && z < heightZ)
@@ -67,13 +61,13 @@ public class GridStructure<TGridObject>
         }
     }
 
-    public void SetValue(Vector3 worldPosition, TGridObject value)
-    {
-        Debug.Log(worldPosition);
-        int x, z;
-        GetXZ(worldPosition, out x, out z);
-        SetValue(x, z, value);
-    }
+    //public void SetValue(Vector3 worldPosition, TGridObject value)
+    //{
+    //    Debug.Log(worldPosition);
+    //    int x, z;
+    //    GetXZ(worldPosition, out x, out z);
+    //    SetValue(x, z, value);
+    //}
 
     public TGridObject GetValue(int x, int z)
     {
@@ -86,10 +80,10 @@ public class GridStructure<TGridObject>
         }
     }
 
-    public TGridObject GetValue(Vector3 worldPosition)
-    {
-        int x, z;
-        GetXZ(worldPosition, out x, out z);
-        return GetValue(x, z);
-    }
+    //public TGridObject GetValue(Vector3 worldPosition)
+    //{
+    //    int x, z;
+    //    GetXZ(worldPosition, out x, out z);
+    //    return GetValue(x, z);
+    //}
 }
