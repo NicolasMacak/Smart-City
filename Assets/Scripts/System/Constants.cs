@@ -8,4 +8,30 @@ namespace CONSTANTS
     {
         public const string GRID_GROUND = "GridGround";
     }
+
+    //public class BUILD_OPTIONS
+    //{
+    //    public const 
+    //}
+
+    public class StructureName
+    {
+        public static string HOUSE = "House";
+        public static string ROAD_TURN = "RoadTurn";
+        public static string ROAD_STRAIGTH = "RoadStraigth";
+    }
+
+    public class SIMULATION
+    {
+        
+
+        public class PARAMETERS
+        {
+
+        }
+
+        public const float CELL_SIZE = 5;
+    }
+
+
 }

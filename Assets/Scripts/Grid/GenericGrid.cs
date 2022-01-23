@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey.Utils;
 
-public class GridStructure<TGridObject>
+public class GenericGrid<TGridObject>
 {
     private int widthX;
     private int heightZ;
-    private float cellSize;
+    public float cellSize { get; }
     private TGridObject[,] gridArray;
     // Keby bolo treba, da sa dat aj originPosition Vector3
     // https://www.youtube.com/watch?v=waEsGu--9P8&list=PLzDRvYVwl53uhO8yhqxcyjDImRjO9W722
@@ -15,7 +15,7 @@ public class GridStructure<TGridObject>
 
     private TextMesh[,] debugTextArray;
     
-    public GridStructure(int width, int height, float cellSize)
+    public GenericGrid(int width, int height, float cellSize)
     {
         this.widthX = width;
         this.heightZ = height;
