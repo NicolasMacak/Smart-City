@@ -5,8 +5,8 @@ using CodeMonkey.Utils;
 
 public class GenericGrid<TGridObject>
 {
-    private int widthX;
-    private int heightZ;
+    public int widthX { get; }
+    public int heightZ { get; }
     public float cellSize { get; }
     private TGridObject[,] gridArray;
     // Keby bolo treba, da sa dat aj originPosition Vector3
@@ -28,21 +28,21 @@ public class GenericGrid<TGridObject>
         {
             for(int z = 0; z < gridArray.GetLength(1); z++)
             {
-               debugTextArray[x, z] = UtilsClass.CreateWorldText(
-                    x+","+z, 
-                    null, 
-                    GetWorldPosition(x, z) + new Vector3(cellSize, 0, cellSize) * 0.5f,
-                    20,
-                    Color.white,
-                    TextAnchor.MiddleCenter);
+                //debugTextArray[x, z] = UtilsClass.CreateWorldText(
+                //     x + "," + z,
+                //     null,
+                //     GetWorldPosition(x, z) + new Vector3(cellSize, 0, cellSize) * 0.5f,
+                //     20,
+                //     Color.white,
+                //     TextAnchor.MiddleCenter);
 
-                Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x, z + 1), Color.red, 100f);
-                Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x + 1, z), Color.red, 100f);
+                //Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x, z + 1), Color.red, 100f);
+                //Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x + 1, z), Color.red, 100f);
             }
         }
 
-        Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.red, 100f);
-        Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.red, 100f);
+        //Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.red, 500f);
+        //Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.red, 500f);
 
         //SetValue(2, 1, 56);
     }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml.Serialization;
 using System.IO;
-//using CONSTANTS;
+using UnityEngine.AI;
 
-using static Validation;
+using static SimulationObject;
 
 public class CityBuilder : MonoBehaviour
 {
@@ -13,16 +13,11 @@ public class CityBuilder : MonoBehaviour
 
     /**
      Pridat separe classu v ktorej bude grid pre objekty. Neskor mozno bude treba ine gridy, preto si ponecham abstraktnu deklaraciu
-     */ 
-    private enum Structure
-    {
-        House,
-        StraightRoad,
-        RoadTurn
-    }
+     */
 
     private BuildOption selectedBuildOption;
-    private Dictionary<Structure, BuildOption> buildOptions = new Dictionary<Structure, BuildOption>();
+    private Orientation selectedOrientation = Orientation.UP;
+    private Dictionary<Model, BuildOption> buildOptions = new Dictionary<Model, BuildOption>();
 
     private GenericGrid<int> grid;
 
@@ -34,6 +29,7 @@ public class CityBuilder : MonoBehaviour
 
     void Start()
     {
+        grid = new GenericGrid<int>(50-1, 50-1, 5f);
         InitGridGround();
         LoadModels();
 
@@ -41,10 +37,19 @@ public class CityBuilder : MonoBehaviour
         //serializer.GenerateXML();
 
         Simulation simulation = ParseSimulationFromXML();
-        grid = new GenericGrid<int>(10, 20, 5f);
+
+        InsintiateTrafficStructures(simulation.trafficStructures);
+        GameObject.Find("NavMeshGenerator").GetComponent<NavMeshSurface>().BuildNavMesh();
 
         InsintiateConsumerStructures(simulation.consumerStructures);
-        InsintiateTrafficStructures(simulation.trafficStructures);
+        
+
+        //GameObject.Find("NavMeshGenerator").GetComponent<NavMeshGenerator>().BakeNavMesh();
+        
+        TrafficManager.InitializeTraffic();
+
+        //NavMeshGenerator.BakeNavMesh();
+
         //Debug.Log("Velkost "+simulation.consumerStructures.Count);
 
         //GameObject housesObj = GameObject.Find("houses");
@@ -52,23 +57,23 @@ public class CityBuilder : MonoBehaviour
 
     private void InsintiateConsumerStructures(List<ConsumerStructure> consumerStructures)
     {
-        selectedBuildOption = buildOptions[Structure.House];
+        selectedBuildOption = buildOptions[Model.House];
 
         foreach (var consumerStructure in consumerStructures)
         {
-
             //Debug.Log(consumerStructure.ToString());
-
+            selectedOrientation = consumerStructure.orientation;
             PlaceStructureFromXml(consumerStructure);
         }
     }
 
     private void InsintiateTrafficStructures(List<Road> roads)
     {
-        selectedBuildOption = buildOptions[Structure.StraightRoad];
 
         foreach (var road in roads)
         {
+            selectedBuildOption = buildOptions[road.model];
+            selectedOrientation = road.orientation;
 
             //Debug.Log(consumerStructure.ToString());
 
@@ -80,15 +85,16 @@ public class CityBuilder : MonoBehaviour
 
     private void LoadModels()
     {
-        buildOptions.Add(Structure.House, new BuildOption(Resources.Load<Transform>("Models/Accomodation/House"), "Houses", CONSTANTS.StructureName.HOUSE));
-        buildOptions.Add(Structure.StraightRoad, new BuildOption(Resources.Load<Transform>("Models/Traffic/StraightRoad"), "Roads", CONSTANTS.StructureName.ROAD_STRAIGTH));
-        buildOptions.Add(Structure.RoadTurn, new BuildOption(Resources.Load<Transform>("Models/Traffic/RoadTurn"), "Roads", CONSTANTS.StructureName.ROAD_TURN));
+        buildOptions.Add(Model.House, new BuildOption(Resources.Load<Transform>("Models/Accomodation/House"), "Houses", CONSTANTS.StructureName.HOUSE, Model.House));
+        buildOptions.Add(Model.RoadStraigth, new BuildOption(Resources.Load<Transform>("Models/Traffic/StraightRoad"), "NavMeshGenerator", CONSTANTS.StructureName.ROAD_STRAIGTH, Model.RoadStraigth));
+        buildOptions.Add(Model.RoadTurn, new BuildOption(Resources.Load<Transform>("Models/Traffic/RoadTurn"), "NavMeshGenerator", CONSTANTS.StructureName.ROAD_TURN, Model.RoadTurn));
 
         selectedBuildOption = buildOptions[0];
     }
 
     private void Update()
     {
+        //Debug.Log(RoundByCellsize(Mouse3D.GetMouseWorldPosition().gridPoint.z));
         if (Input.GetMouseButtonDown(0))
         {
             PlaceStructureByClick();
@@ -100,15 +106,31 @@ public class CityBuilder : MonoBehaviour
 
         if(Input.GetKey("1"))
         {
-            selectedBuildOption = buildOptions[Structure.House];
+            selectedBuildOption = buildOptions[Model.House];
         }
         else if (Input.GetKey("2"))
         {
-            selectedBuildOption = buildOptions[Structure.StraightRoad];
+            selectedBuildOption = buildOptions[Model.RoadStraigth];
         }
         else if (Input.GetKey("3"))
         {
-            selectedBuildOption = buildOptions[Structure.RoadTurn];
+            selectedBuildOption = buildOptions[Model.RoadTurn];
+        }
+        else if (Input.GetKey("up"))
+        {
+            selectedOrientation = Orientation.UP;
+        }
+        else if (Input.GetKey("down"))
+        {
+            selectedOrientation = Orientation.DOWN;
+        }
+        else if (Input.GetKey("left"))
+        {
+            selectedOrientation = Orientation.LEFT;
+        }
+        else if (Input.GetKey("right"))
+        {
+            selectedOrientation = Orientation.RIGHT;
         }
         //Debug.Log(Mouse3D.GetMouseWorldPosition());
     }
@@ -127,13 +149,14 @@ public class CityBuilder : MonoBehaviour
         if (raycastCollision.ShouldInteractionStop(BuilderAction.Build)) { return; }
 
         Vector3 clickedPosition = raycastCollision.gridPoint;
-        clickedPosition.x = RoundByCellsize(clickedPosition.x);
-        clickedPosition.z = RoundByCellsize(clickedPosition.z);
+
+        clickedPosition.x = BuilderUtilities.RoundByCellsize(clickedPosition.x);
+        clickedPosition.z = BuilderUtilities.RoundByCellsize(clickedPosition.z);
 
         InstintiateStructure(clickedPosition);
     }
 
-    private void PlaceStructureFromXml(SimulationObject simulationObjects)
+    private void PlaceStructureFromXml(SimulationObjectXml simulationObjects)
     {
         Vector3 coordinates = new Vector3();
         coordinates.x = simulationObjects.position.x * grid.cellSize;
@@ -147,7 +170,7 @@ public class CityBuilder : MonoBehaviour
         var raycastCollision = Mouse3D.GetMouseWorldPosition();
         if (raycastCollision.ShouldInteractionStop(BuilderAction.Destroy)) { return; }
 
-        Destroy(raycastCollision.collidedObject);
+        Destroy(raycastCollision.collidedObject.transform.parent.gameObject);
     }
 
     private void InitGridGround()
@@ -156,13 +179,27 @@ public class CityBuilder : MonoBehaviour
 
         Vector3 rescale = gridGround.transform.localScale;
 
-        rescale.z *= 20;
-        rescale.x *= 10;
+        float xLenth = grid.widthX /2;
+        float zLenth = grid.heightZ /2;
+
+        float xOffset = xLenth * grid.cellSize;
+        float zOffset = zLenth * grid.cellSize;
+
+        rescale.z *= zLenth;
+        rescale.x *= xLenth;
 
         gridGround.transform.localScale = rescale;
         //gridGround.transform.localScale.z = 200;
         //gridGround.transform.localScale.x = 100;
-        gridGround.transform.position = new Vector3(50, 0, 100); //housesObj.transform.position;
+        gridGround.transform.position = new Vector3(xOffset, 0, zOffset); //housesObj.transform.position;
+
+        //rescale.z *= 20;
+        //rescale.x *= 10;
+
+        //gridGround.transform.localScale = rescale;
+        ////gridGround.transform.localScale.z = 200;
+        ////gridGround.transform.localScale.x = 100;
+        //gridGround.transform.position = new Vector3(50, 0, 100); //housesObj.transform.position;
     }
 
     private Simulation ParseSimulationFromXML() 
@@ -184,16 +221,24 @@ public class CityBuilder : MonoBehaviour
 
     public void InstintiateStructure(Vector3 coordinates)
     {
-        var instintiatedStructure = Instantiate(selectedBuildOption.model, coordinates, Quaternion.identity);
-        instintiatedStructure.name = selectedBuildOption.name;
+        coordinates = BuilderUtilities.GetRotatedCoordinates(coordinates, selectedOrientation); 
+
+        var instintiatedStructure = Instantiate(
+            selectedBuildOption.prefab,
+            coordinates,
+            BuilderUtilities.GetQuarterionFromOrientation(selectedOrientation)
+            );
+
+        AddAttributesToInstintiatedStructure(instintiatedStructure);
         instintiatedStructure.SetParent(GameObject.Find(selectedBuildOption.parrentGameObject).transform);
     }
 
-    private int RoundByCellsize(float n)
+    private void AddAttributesToInstintiatedStructure(Transform instintiatedStructure)
     {
-        var intN = Mathf.FloorToInt(n);
+        instintiatedStructure.name = selectedBuildOption.name;
 
-        return ((intN / (int)grid.cellSize) * (int)grid.cellSize);
+        SimulationObject simulationObjectScript = instintiatedStructure.gameObject.AddComponent<SimulationObject>();
+        simulationObjectScript.orientation = selectedOrientation;
+        simulationObjectScript.model = selectedBuildOption.model;
     }
-
 }

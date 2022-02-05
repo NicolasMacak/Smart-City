@@ -20,9 +20,6 @@ public class SimulationXmlGenerator
         simulation.consumerStructures = prepareConsumerStructures(GameObject.Find("Houses").transform);
         simulation.trafficStructures  = prepareRoadStructures(GameObject.Find("Roads").transform);
 
-        Debug.Log(simulation.consumerStructures);
-        Debug.Log(simulation.trafficStructures);
-
         serializer.Serialize(writer, simulation);
         writer.Close();
     }

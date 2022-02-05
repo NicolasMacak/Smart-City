@@ -16,6 +16,11 @@ public class CameraController : MonoBehaviour
     {
         Vector3 pos = transform.position;
 
+        if(Input.mousePosition.y > Screen.height || Input.mousePosition.y <= 0 || Input.mousePosition.x > Screen.width || Input.mousePosition.x < 0)
+        {
+            return;
+        }
+
         if(Input.GetKey("w") || Input.mousePosition.y >= Screen.height - panBorderThickness)
         {
             pos.z += penSpeed * Time.deltaTime;

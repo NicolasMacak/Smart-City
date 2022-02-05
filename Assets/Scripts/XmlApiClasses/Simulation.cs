@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using UnityEngine;
 
+using static SimulationObject;
+
 [XmlRoot("Simulation")]
 public class Simulation
 {
@@ -24,7 +26,7 @@ public class Simulation
 //    public ConsumerStructure[] consumerStructures { get; set; }
 //}
 
-public class ConsumerStructure : SimulationObject
+public class ConsumerStructure : SimulationObjectXml
 
 {
     public ConsumerStructure() { }
@@ -48,7 +50,7 @@ public class ConsumerStructure : SimulationObject
     }
 }
 
-public class Road : SimulationObject
+public class Road : SimulationObjectXml
 {
     public Road() { }
 
@@ -94,20 +96,18 @@ public class Road : SimulationObject
 //    }
 //}
 
-public class SimulationObject
+public class SimulationObjectXml
 {
-    public enum Orientation
-    {
-        UP, DOWN, LEFT, RIGHT
-    }
+    public SimulationObjectXml() { }
 
-    public SimulationObject() { }
-
-    public SimulationObject(Transform simulationObject)
+    public SimulationObjectXml(Transform simulationObject)
     {
+        SimulationObject simulationObjectScript = simulationObject.gameObject.GetComponent<SimulationObject>();
+
         this.id = 1;
-        this.position = SimulationObjectUtilities.GetPosition(simulationObject.transform.position);
-        this.orientation = SimulationObjectUtilities.GetOrientationFromAngle(simulationObject.transform.rotation.y);
+        this.position = simulationObjectScript.GetPosition(); // SimulationObjectUtilities.GetPosition(simulationObject.transform.position);
+        this.orientation = simulationObjectScript.orientation; //SimulationObjectUtilities.GetOrientationFromAngle(simulationObject.transform.rotation.y);
+        this.model = simulationObjectScript.model;
     }
 
     [XmlElement("id")]
@@ -122,6 +122,7 @@ public class SimulationObject
     [XmlElement("orientation")]
     public Orientation orientation { get; set; }
 
+    public Model model { get; set; }
 }
 
 public class Position
