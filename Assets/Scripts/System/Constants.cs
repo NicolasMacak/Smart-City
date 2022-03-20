@@ -19,6 +19,12 @@ namespace CONSTANTS
         public static string HOUSE = "House";
         public static string ROAD_TURN = "RoadTurn";
         public static string ROAD_STRAIGTH = "RoadStraigth";
+        public static string TREE = "Tree";
+    }
+
+    public class STRUCTURE_CONTAINER
+    {
+        public static string HOUSES = "Houses";
     }
 
     public class SIMULATION

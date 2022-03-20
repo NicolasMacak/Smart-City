@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml.Serialization;
 using System.IO;
+using System;
 using UnityEngine.AI;
 
 using static SimulationObject;
@@ -27,43 +28,38 @@ public class CityBuilder : MonoBehaviour
         Destroy
     }
 
+    private void debugTrafficStructures(Simulation simulation)
+    {
+        foreach(var road in simulation.trafficStructures)
+        {
+            Debug.Log(road.ToString());
+        }
+    }
+
     void Start()
     {
         grid = new GenericGrid<int>(50-1, 50-1, 5f);
         InitGridGround();
         LoadModels();
 
-        //SimulationSerializer serializer = new SimulationSerializer();
-        //serializer.GenerateXML();
-
         Simulation simulation = ParseSimulationFromXML();
-
+        //debugTrafficStructures(simulation);
         InsintiateTrafficStructures(simulation.trafficStructures);
-        GameObject.Find("NavMeshGenerator").GetComponent<NavMeshSurface>().BuildNavMesh();
-
+        //GameObject.Find("NavMeshGenerator").GetComponent<NavMeshSurface>().BuildNavMesh();
+        
         InsintiateConsumerStructures(simulation.consumerStructures);
-        
 
-        //GameObject.Find("NavMeshGenerator").GetComponent<NavMeshGenerator>().BakeNavMesh();
-        
-        TrafficManager.InitializeTraffic();
-
-        //NavMeshGenerator.BakeNavMesh();
-
-        //Debug.Log("Velkost "+simulation.consumerStructures.Count);
-
-        //GameObject housesObj = GameObject.Find("houses");
+        //TrafficManager.InitializeTraffic();
     }
 
     private void InsintiateConsumerStructures(List<ConsumerStructure> consumerStructures)
     {
-        selectedBuildOption = buildOptions[Model.House];
-
         foreach (var consumerStructure in consumerStructures)
         {
+            selectedBuildOption = buildOptions[consumerStructure.model];
             //Debug.Log(consumerStructure.ToString());
             selectedOrientation = consumerStructure.orientation;
-            PlaceStructureFromXml(consumerStructure);
+            PlaceStructureFromXml(consumerStructure); //InstitiateFromXml(consumerStructure); 
         }
     }
 
@@ -77,7 +73,7 @@ public class CityBuilder : MonoBehaviour
 
             //Debug.Log(consumerStructure.ToString());
 
-            PlaceStructureFromXml(road);
+            PlaceStructureFromXml(road); //InstitiateFromXml(road); 
         }
     }
 
@@ -85,11 +81,21 @@ public class CityBuilder : MonoBehaviour
 
     private void LoadModels()
     {
-        buildOptions.Add(Model.House, new BuildOption(Resources.Load<Transform>("Models/Accomodation/House"), "Houses", CONSTANTS.StructureName.HOUSE, Model.House));
-        buildOptions.Add(Model.RoadStraigth, new BuildOption(Resources.Load<Transform>("Models/Traffic/StraightRoad"), "NavMeshGenerator", CONSTANTS.StructureName.ROAD_STRAIGTH, Model.RoadStraigth));
-        buildOptions.Add(Model.RoadTurn, new BuildOption(Resources.Load<Transform>("Models/Traffic/RoadTurn"), "NavMeshGenerator", CONSTANTS.StructureName.ROAD_TURN, Model.RoadTurn));
+        buildOptions.Add(Model.SmallHouse, new BuildOption(Resources.Load<Transform>("Prefabs/Accomodation/SmallHouse"), "Houses", CONSTANTS.StructureName.HOUSE, Model.SmallHouse));
+        buildOptions.Add(Model.BigHouse, new BuildOption(Resources.Load<Transform>("Prefabs/Accomodation/BigHouse"), "Houses", CONSTANTS.StructureName.HOUSE, Model.BigHouse));
+        buildOptions.Add(Model.RoadStraigth, new BuildOption(Resources.Load<Transform>("Prefabs/Traffic/StraightRoad"), "Roads", CONSTANTS.StructureName.ROAD_STRAIGTH, Model.RoadStraigth));
+        buildOptions.Add(Model.RoadTurn, new BuildOption(Resources.Load<Transform>("Prefabs/Traffic/RoadTurn"), "Roads", CONSTANTS.StructureName.ROAD_TURN, Model.RoadTurn));
+        buildOptions.Add(Model.Tree, new BuildOption("Green", CONSTANTS.StructureName.TREE, Model.Tree));
 
-        selectedBuildOption = buildOptions[0];
+        foreach(var buildOption in buildOptions)
+        {
+            if(buildOption.Value.prefab == null)
+            {
+                Debug.LogError("PREFAB NOT LOADED FOR " + buildOption.Value.name);
+            }
+        }
+
+        selectedBuildOption = buildOptions[Model.SmallHouse];
     }
 
     private void Update()
@@ -106,16 +112,25 @@ public class CityBuilder : MonoBehaviour
 
         if(Input.GetKey("1"))
         {
-            selectedBuildOption = buildOptions[Model.House];
+            selectedBuildOption = buildOptions[Model.SmallHouse];
         }
         else if (Input.GetKey("2"))
         {
-            selectedBuildOption = buildOptions[Model.RoadStraigth];
+            selectedBuildOption = buildOptions[Model.BigHouse];
         }
         else if (Input.GetKey("3"))
         {
+            selectedBuildOption = buildOptions[Model.RoadStraigth];
+        }
+        else if (Input.GetKey("4"))
+        {
             selectedBuildOption = buildOptions[Model.RoadTurn];
         }
+        else if (Input.GetKey("5"))
+        {
+            selectedBuildOption = buildOptions[Model.Tree];
+        }
+
         else if (Input.GetKey("up"))
         {
             selectedOrientation = Orientation.UP;
@@ -153,17 +168,48 @@ public class CityBuilder : MonoBehaviour
         clickedPosition.x = BuilderUtilities.RoundByCellsize(clickedPosition.x);
         clickedPosition.z = BuilderUtilities.RoundByCellsize(clickedPosition.z);
 
-        InstintiateStructure(clickedPosition);
+        if(selectedBuildOption.model == Model.Tree)
+        {
+            SetTreeAsBuildingOption();
+        }
+
+        InstintiateStructureAndAddAttributes(clickedPosition);
     }
 
-    private void PlaceStructureFromXml(SimulationObjectXml simulationObjects)
+    private void SetTreeAsBuildingOption()
+    {
+        System.Random r = new System.Random();
+        Transform treePrefab = Resources.Load<Transform>("Prefabs/Generic/Trees/Tree_" + r.Next(2, 5));
+        
+        Vector3 scale = treePrefab.transform.localScale;
+        int coeficient = r.Next(-2, 2);
+
+        float sizeCoeficient = ((float)coeficient) / 10;
+        scale.x += sizeCoeficient;
+        scale.y += sizeCoeficient;
+        scale.z += sizeCoeficient;
+        treePrefab.transform.localScale = scale;
+
+        Debug.Log(treePrefab.rotation.ToString());
+        treePrefab.rotation *= new Quaternion(0,coeficient*90,0,0);
+        Debug.Log(treePrefab.rotation.ToString());
+        selectedBuildOption.prefab = treePrefab;
+    }
+
+    private void PlaceStructureFromXml(SimulationObjectXml simulationObject)
     {
         Vector3 coordinates = new Vector3();
-        coordinates.x = simulationObjects.position.x * grid.cellSize;
-        coordinates.z = simulationObjects.position.z * grid.cellSize;
+        coordinates.x = simulationObject.position.x * grid.cellSize;
+        coordinates.z = simulationObject.position.z * grid.cellSize;
 
-        InstintiateStructure(coordinates);
+        //RegisterObjectOnGrid(simulationObject);
+        InstintiateStructureAndAddAttributes(coordinates);
     }
+
+    //private void RegisterObjectOnGrid(SimulationObjectXml simulationObject)
+    //{
+
+    //}
 
     private void DestroyStructure()
     {
@@ -204,7 +250,7 @@ public class CityBuilder : MonoBehaviour
 
     private Simulation ParseSimulationFromXML() 
     {
-        var fileStream = File.Open("Assets/manualConstructedSimulation.xml", FileMode.Open); // XML parsing
+        var fileStream = File.Open("Assets/NewHouseSimulation.xml", FileMode.Open); // XML parsing
         //var fileStream = File.Open("manualConstructedSimulation.xml", FileMode.Open); // XML parsing
         XmlSerializer serializer = new XmlSerializer(typeof(Simulation));
         return (Simulation)serializer.Deserialize(fileStream);
@@ -219,21 +265,52 @@ public class CityBuilder : MonoBehaviour
     //    ggg.SetParent(GameObject.Find("houses").transform);
     //}
 
-    public void InstintiateStructure(Vector3 coordinates)
+    public void InstitiateFromXml(SimulationObjectXml simulationObject) // testujeme vonku
     {
+
+        var instintiatedStructure = Instantiate(
+            selectedBuildOption.prefab,
+            simulationObject.GetRealWorldCoordinates(),
+            BuilderUtilities.GetQuarterionFromOrientation(selectedOrientation)
+        );
+
+        AddGegenricAttributesToInstintiatedStructure(instintiatedStructure);
+        AddSpecificAttributesToInstintiatedStrucutre(instintiatedStructure);
+        Debug.Log("Prvy");
+        instintiatedStructure.SetParent(GameObject.Find(selectedBuildOption.parrentGameObject).transform);
+    }
+    public void InstintiateStructureAndAddAttributes(Vector3 coordinates)
+    {
+        
+        
+            Debug.Log(selectedBuildOption);
+        
+
         coordinates = BuilderUtilities.GetRotatedCoordinates(coordinates, selectedOrientation); 
+
+
 
         var instintiatedStructure = Instantiate(
             selectedBuildOption.prefab,
             coordinates,
             BuilderUtilities.GetQuarterionFromOrientation(selectedOrientation)
             );
-
-        AddAttributesToInstintiatedStructure(instintiatedStructure);
+        
+        AddGegenricAttributesToInstintiatedStructure(instintiatedStructure);
+        AddSpecificAttributesToInstintiatedStrucutre(instintiatedStructure);
+        //Debug.Log("Prvy");
         instintiatedStructure.SetParent(GameObject.Find(selectedBuildOption.parrentGameObject).transform);
     }
 
-    private void AddAttributesToInstintiatedStructure(Transform instintiatedStructure)
+    private void AddSpecificAttributesToInstintiatedStrucutre(Transform instintiatedStructure)
+    {
+        switch (selectedBuildOption.model)
+        {
+            //case Model.House: instintiatedStructure.GetComponent<HouseController>().additions =
+        }
+    }
+
+    private void AddGegenricAttributesToInstintiatedStructure(Transform instintiatedStructure)
     {
         instintiatedStructure.name = selectedBuildOption.name;
 

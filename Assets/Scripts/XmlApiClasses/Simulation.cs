@@ -33,8 +33,20 @@ public class ConsumerStructure : SimulationObjectXml
 
     public ConsumerStructure(Transform consumerStructure) : base(consumerStructure) 
     {
-        this.category = Category.House;
+        var houseController = consumerStructure.GetComponent<HouseController>();
+        category = Category.House;
+        //additions = houseController.GetAdditions();
+        //if (additions.Count != 0)
+        //{
+        //    Debug.Log(additions[0]);
+        //}
     } // used when converting simulation to xml
+
+    public enum Addition
+    {
+        None,
+        Garage
+    }
 
     public enum Category
     {
@@ -42,6 +54,8 @@ public class ConsumerStructure : SimulationObjectXml
     }
 
     Category category;
+    List<Addition> additions;
+
 
     override
     public string ToString()
@@ -122,7 +136,15 @@ public class SimulationObjectXml
     [XmlElement("orientation")]
     public Orientation orientation { get; set; }
 
+    [XmlElement("model")]
     public Model model { get; set; }
+
+    public Vector3 GetRealWorldCoordinates()
+    {
+        return new Vector3(
+            position.x * CONSTANTS.SIMULATION.CELL_SIZE,
+            position.z * CONSTANTS.SIMULATION.CELL_SIZE);
+    }
 }
 
 public class Position

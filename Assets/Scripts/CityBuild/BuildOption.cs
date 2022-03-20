@@ -13,9 +13,16 @@ public class BuildOption
         this.model = model;
     }
 
+    public BuildOption(string parrentGameObject, string name, Model model)
+    {
+        this.parrentGameObject = parrentGameObject;
+        this.name = name;
+        this.model = model;
+    }
+
     public Model model { get; }
 
     public string parrentGameObject { get; }
-    public Transform prefab { get; }
+    public Transform prefab { get; set; }
     public string name { get; }
 }

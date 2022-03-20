@@ -18,7 +18,7 @@ public class TrafficManager
     {
         for(int i=0; i < houses.childCount; i++)
         {
-            CarAgent car = houses.GetChild(i).GetChild(4).GetComponent<CarAgent>();
+            CarAgent car = houses.GetChild(i).GetComponentInChildren<CarAgent>();// .GetChild(4).GetComponent<CarAgent>();
             car.SetWaypoints(waypoints);
             car.BrmBrm();
         }
@@ -30,8 +30,8 @@ public class TrafficManager
 
         for(int i=0; i < houses.childCount; i++)
         {
-            //Debug.Log(houses.transform.GetChild(i).GetChild(3).name);
-            Vector3 houseWaypoint = houses.GetChild(i).GetChild(3).position;
+            //Debug.Log(houses.transform.GetChild(i).GetChild(2).name);
+            Vector3 houseWaypoint = houses.GetChild(i).GetChild(2).position;
             waypoinstToReturn.Add(houseWaypoint);
         }
 

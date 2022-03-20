@@ -12,19 +12,19 @@ public class SimulationXmlGenerator
     {
         XmlSerializer serializer = new XmlSerializer(typeof(Simulation));
 
-        File.Delete("Assets/manualConstructedSimulation.xml");
-        TextWriter writer = new StreamWriter("Assets/manualConstructedSimulation.xml");
+        //File.Delete("Assets/manualConstructedSimulation.xml");
+        TextWriter writer = new StreamWriter("Assets/NewHouseSimulation.xml");
 
         Simulation simulation = new Simulation();
 
-        simulation.consumerStructures = prepareConsumerStructures(GameObject.Find("Houses").transform);
-        simulation.trafficStructures  = prepareRoadStructures(GameObject.Find("Roads").transform);
+        simulation.consumerStructures = PrepareConsumerStructures(GameObject.Find("Houses").transform);
+        simulation.trafficStructures = PrepareRoadStructures(GameObject.Find("Roads").transform);
 
         serializer.Serialize(writer, simulation);
         writer.Close();
     }
 
-    private static List<ConsumerStructure> prepareConsumerStructures(Transform houses)
+    private static List<ConsumerStructure> PrepareConsumerStructures(Transform houses)
     {
         List<ConsumerStructure> consumerStructures = new List<ConsumerStructure>();
 
@@ -39,7 +39,7 @@ public class SimulationXmlGenerator
         return consumerStructures;
     }
 
-    private static List<Road> prepareRoadStructures(Transform roads)
+    private static List<Road> PrepareRoadStructures(Transform roads)
     {
         List<Road> consumerStructures = new List<Road>();
 
